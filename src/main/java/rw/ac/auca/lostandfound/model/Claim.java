@@ -28,7 +28,7 @@ public class Claim {
     @Temporal(TemporalType.DATE)
     private Date claimDate;
 
-    @NotBlank(message = "Status is required")
+    
     @Column(nullable = false)
     private String status;
 }

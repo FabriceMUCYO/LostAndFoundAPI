@@ -7,15 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rw.ac.auca.lostandfound.model.ActivityLog;
+import rw.ac.auca.lostandfound.repository.ActivityLogRepository;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/items")
 public class ItemController {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private ActivityLogRepository activityLogRepository;
 
     @GetMapping
     public List<Item> getAllItems() {
@@ -35,6 +42,12 @@ public class ItemController {
             return ResponseEntity.badRequest().body("Status must be LOST, FOUND, or CLAIMED");
         }
         Item saved = itemRepository.save(item);
+        activityLogRepository.save(new ActivityLog(
+                null,
+                "ITEM_REPORTED",
+                "Item '" + saved.getName() + "' reported as " + saved.getStatus() + " by " + saved.getReportedByName(),
+                LocalDateTime.now()
+        ));
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
